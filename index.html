@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Kindle Giro</title>
+    <style>
+        body { 
+            background-color: white; 
+            color: black; 
+            font-family: Arial, Helvetica, sans-serif; 
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ESTA CAIXA GIRA O SITE TODO EM 90 GRAUS PARA VOCÊ USAR O KINDLE DEITADO */
+        .conteudo-girado {
+            transform: rotate(90deg);
+            transform-origin: center;
+            width: 100vh; /* Inverte largura pela altura no giro */
+            height: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #relogio { 
+            font-size: 26vh; /* Usa a altura máxima disponível para ficar gigante */
+            font-weight: 900; 
+            line-height: 0.85;
+            margin: 0;
+        }
+        
+        #data { 
+            font-size: 4.5vh; 
+            font-weight: bold;
+            margin-top: 15px; 
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        #clima { 
+            font-size: 5vh; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="conteudo-girado">
+        <div id="relogio">00:00</div>
+        <div id="data">CARREGANDO...</div>
+        <div id="clima">Carregando clima...</div>
+    </div>
+
+    <script>
+        function iniciarRelogio() {
+            var agora = new Date();
+            var horaBrasilia = agora.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('relogio').textContent = horaBrasilia;
+            
+            var formatoData = { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' };
+            document.getElementById('data').textContent = agora.toLocaleDateString('pt-BR', formatoData);
+        }
+
+        function buscarClima() {
+            // Puxa apenas a linha simples que você pediu: Ex: Guarapari: +25°C Ensolarado
+            fetch('https://wttr.in/Guarapari?format=%l:+%t+%C')
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('clima').textContent = data;
+                })
+                .catch(() => {
+                    document.getElementById('clima').textContent = "Guarapari";
+                });
+        }
+        
+        setInterval(iniciarRelogio, 1000);
+        iniciarRelogio();
+        buscarClima();
+        setInterval(buscarClima, 900000);
+    </script>
+
+</body>
+</html>
