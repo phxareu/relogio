@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel Kindle</title>
+    <style>
+        body { 
+            background-color: white; 
+            color: black; 
+            font-family: Arial, sans-serif; 
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Gira o conteúdo em 90 graus para o Kindle deitado */
+        .paisagem {
+            transform: rotate(90deg);
+            transform-origin: center;
+            width: 100vh; 
+            height: 100vw;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        #relogio { 
+            font-size: 26vh; 
+            font-weight: 900; 
+            line-height: 0.85;
+            margin: 0;
+        }
+        
+        #data { 
+            font-size: 4.5vh; 
+            font-weight: bold;
+            margin-top: 15px; 
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        #clima { 
+            font-size: 5vh; 
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="paisagem">
+        <div id="relogio">00:00</div>
+        <div id="data">CARREGANDO...</div>
+        <div id="clima">Guarapari --°C</div>
+    </div>
+
+    <script>
+        function iniciarRelogio() {
+            var agora = new Date();
+            document.getElementById('relogio').textContent = agora.toLocaleTimeString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' });
+            document.getElementById('data').textContent = agora.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' });
+        }
+
+        function buscarClima() {
+            // Puxa os dados direto do serviço meteorológico open-meteo (Latitude/Longitude de Guarapari)
+            fetch('https://api.open-meteo.com/v1/forecast?latitude=-20.6667&longitude=-40.4975&current_weather=true')
+                .then(response => response.json())
+                .then(data => {
+                    var temp = Math.round(data.current_weather.temperature);
+                    document.getElementById('clima').textContent = "Guarapari " + temp + "°C";
+                })
+                .catch(() => {
+                    document.getElementById('clima').textContent = "Guarapari --°C";
+                });
+        }
+        
+        setInterval(iniciarRelogio, 1000);
+        iniciarRelogio();
+        buscarClima();
+        setInterval(buscarClima, 600000); // Atualiza a cada 10 minutos
+    </script>
+
+</body>
+</html>
